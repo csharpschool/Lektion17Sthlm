@@ -1,0 +1,99 @@
+﻿@page "/"
+@using Lektion17Sthlm.Classes;
+@using Lektion17Sthlm.Services;
+@inject Store store
+
+<h1>Pet Store</h1>
+@* @if(store.Pets is not null)
+{
+    <ul>
+        @foreach(var animal in store.Pets)
+        {
+            <li class="h3">Original Data: @animal.Name, @animal.Species, @animal.Id</li>
+        }
+    </ul>
+} *@
+
+<ul>
+    @foreach (var animal in store.Get<Pet>(store.Pets, p => p.Species == Species.Cat && p.Id > 2))
+    {
+        <li class="h3">Filtered: @animal.Name, @animal.Species, @animal.Id</li>
+    }
+</ul>
+
+<h3>@store.First(p => p.Species == Species.Donkey)?.Name</h3> @* Fel pga ingen matchning *@
+<h3>@store.First(p => p.Species == Species.Cat)?.Name</h3>
+<input @bind="name"/>
+@* <button class="btn btn-primary" @onclick="@(() => pet = store.Single(p => p.Name == name))">Filter</button> *@
+<button class="btn btn-primary" @onclick="@(() => pet = store.Single(name))">Filter</button>
+
+@if (pet is not null)
+{
+  <div class="alert alert-success" role="alert">
+    @pet.Name
+  </div>
+}
+
+@* <ul>
+    @foreach (var animal in store.Select(p => p.Species == Species.Cat))
+    {
+        <li class="h3">Select: @animal</li>
+    }
+</ul> *@
+
+<ul>
+    @foreach (var mamal in store.Select(p => p.Species == Species.Cat))
+    {
+        <li class="h3">Select: @mamal.Name, @mamal.Id</li>
+    }
+</ul>
+
+<button class="btn btn-primary" @onclick="@(() => pets = store.Sort(
+    p => p.Species == Species.Cat || p.Species == Species.Dog))">
+    Sort
+</button>
+
+@if (pets is not null)
+{
+
+    <ul>
+        @foreach (var p in pets)
+        {
+            <li class="h3">Sort: @p.Name, @p.Species</li>
+        }
+    </ul>
+}
+
+<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-group me-2" role="group" aria-label="First group">
+        <button @onclick="@(() => pets = store.PetPicker(
+            p => p.Species == Species.Cat || p.Species == Species.Dog, 0, 3))" 
+                type="button" class="btn btn-primary">1</button>
+        <button @onclick="@(() => pets = store.PetPicker(
+            p => p.Species == Species.Cat || p.Species == Species.Dog, 1, 3))"
+                type="button" class="btn btn-primary">
+            2
+        </button>
+        <button @onclick="@(() => pets = store.PetPicker(
+            p => p.Species == Species.Cat || p.Species == Species.Dog, 2, 3))"
+                type="button" class="btn btn-primary">
+            3
+        </button>
+    </div>
+</div>
+
+@if (pets is not null)
+{
+
+    <ul>
+        @foreach (var p in pets)
+        {
+            <li class="h3">Picker: @p.Name, @p.Species</li>
+        }
+    </ul>
+}
+@code{
+    string name = string.Empty;
+    List<Pet>? pets;
+    Pet? pet;
+}
